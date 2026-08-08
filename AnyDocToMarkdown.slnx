@@ -1,2 +1,6 @@
 <Solution>
+  <Project Path="src/AnyDocToMarkdown/AnyDocToMarkdown.csproj" />
+  <Project Path="src/AnyDocToMarkdown.BlazorWasm/AnyDocToMarkdown.BlazorWasm.csproj" />
+  <Project Path="src/AnyDocToMarkdown.Tests/AnyDocToMarkdown.Tests.csproj" />
+  <Project Path="src/AnyDocToMarkdown.BlazorWasm.Tests/AnyDocToMarkdown.BlazorWasm.Tests.csproj" />
 </Solution>

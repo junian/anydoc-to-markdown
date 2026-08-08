@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+
+    <AssemblyName>AnyDocToMarkdown.BlazorWasm</AssemblyName>
+    <RootNamespace>AnyDocToMarkdown</RootNamespace>
+
+    <Version>0.1.0</Version>
+    <Description>WebAssembly binding for anydoc: convert documents (doc, docx, odt, rtf, epub, pdf, presentations, spreadsheets, csv) to GitHub-Flavored Markdown inside a Blazor WebAssembly app, without any native platform library.</Description>
+    <PackageId>AnyDocToMarkdown.BlazorWasm</PackageId>
+    <Authors>Junian Triajianto</Authors>
+    <Owners>junian</Owners>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/junian/anydoc</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/junian/anydoc</RepositoryUrl>
+    <PackageTags>markdown; docx; pptx; xlsx; epub; pdf; converter; blazor; wasm; document</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <!-- A Razor class library so wwwroot/** ships as static web assets to Blazor
+       WASM hosts under /_content/AnyDocToMarkdown.BlazorWasm/. It carries three
+       files: the wasm-bindgen glue, the wasm binary, and our interop shim.
+       The first two are produced by `cargo build -p anydoc-wasm` of the anydoc
+       submodule and copied here by build-wasm.sh. -->
+  <ItemGroup>
+    <None Include="wwwroot/**/*" />
+  </ItemGroup>
+
+  <!-- Reuse the exact document model and shared types the native binding
+       publishes, so both packages expose the same AnyDocToMarkdown types. -->
+  <ItemGroup>
+    <Compile Include="../AnyDocToMarkdown.Shared/Model.cs" Link="Shared/Model.cs" />
+    <Compile Include="../AnyDocToMarkdown.Shared/Types.cs" Link="Shared/Types.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.JSInterop" Version="8.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../docs/README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>

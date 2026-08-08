@@ -5,6 +5,7 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +14,20 @@
 
   <ItemGroup>
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../AnyDocToMarkdown/AnyDocToMarkdown.csproj" />
+  </ItemGroup>
+
+  <!-- The fixtures the smoke tests round-trip. Copied into the build output so
+       tests run from any working directory. -->
+  <ItemGroup>
+    <None Include="../../libs/anydoc/tests/fixtures/docx/handmade-outline.docx" Link="fixtures/docx/handmade-outline.docx" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../libs/anydoc/tests/fixtures/docx/handmade-rich.docx" Link="fixtures/docx/handmade-rich.docx" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../libs/anydoc/tests/fixtures/csv/sheet.csv" Link="fixtures/csv/sheet.csv" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../libs/anydoc/tests/fixtures/malformed/encrypted--errors.odt" Link="fixtures/malformed/encrypted--errors.odt" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../libs/anydoc/tests/fixtures/abuse/zipbomb--errors.docx" Link="fixtures/abuse/zipbomb--errors.docx" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
