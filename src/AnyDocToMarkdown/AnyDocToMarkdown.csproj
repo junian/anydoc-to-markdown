@@ -30,18 +30,15 @@
 
   <!--
     Native binaries laid out per NuGet's runtimes/{rid}/native convention and
-    packed for every RID. When consumed as a package, the SDK copies only the
+    packed for every RID; when the package is consumed, the SDK copies only the
     assets matching the target's RuntimeIdentifier (iOS/Android/desktop
-    resolvers bundle exactly their architecture). On a plain project reference
-    no RID filtering happens, so the whole runtimes tree is copied to the
-    consumer's output and the resolver picks its platform's library.
+    resolvers bundle exactly their architecture), so cross-platform runners
+    (e.g. a Mac Catalyst app) never see another platform's library.
   -->
   <ItemGroup>
     <None Include="runtimes/**/*"
           Pack="true"
-          PackagePath="runtimes/"
-          CopyToOutputDirectory="PreserveNewest"
-          Link="runtimes/%(RecursiveDir)%(Filename)%(Extension)" />
+          PackagePath="runtimes/" />
   </ItemGroup>
 
   <!-- Shared types used by both the native and WebAssembly bindings live in
