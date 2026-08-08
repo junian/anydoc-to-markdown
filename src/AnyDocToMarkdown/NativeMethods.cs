@@ -9,8 +9,8 @@ namespace AnyDocToMarkdown.Native
     /// <summary>
     /// DllImport surface, extended with an <see cref="AnydocNative"/> static
     /// constructor that registers a platform-specific loader mapping the logical
-    /// library name to <c>runtimes/{platform}-{arch}/native/</c>, the layout both
-    /// NuGet and this project's build output use.
+    /// library name to <c>runtimes/{rid}/native/</c>, the layout both NuGet and
+    /// this project's build output use.
     /// </summary>
     /// <remarks>
     /// <see cref="System.Runtime.InteropServices.NativeLibrary"/> (and the
@@ -20,12 +20,39 @@ namespace AnyDocToMarkdown.Native
     /// dynamically constructed delegate, keeping the compiled surface clean for
     /// every consuming runtime while still attaching the real resolver on runtimes
     /// that provide it.
+    ///
+    /// Resolution rules:
+    /// <list type="bullet">
+    ///   <item>Desktop (Windows / macOS / Linux): resolve
+    ///     <c>runtimes/{platform}-{arch}/native/</c> from the app and assembly
+    ///     locations and load that file by path.</item>
+    ///   <item>Mobile (iOS, iOS simulator, Mac Catalyst, Android): the runtime
+    ///     already binds libraries shipped under <c>runtimes/{rid}/native</c>
+    ///     into the app and probes them by name, so this resolver only confirms
+    ///     the name and lets the platform loader handle it.</item>
+    /// </list>
+    ///
+    /// The dynamic-IL registration is best-effort: if the runtime disallows
+    /// <c>DynamicMethod</c> (e.g. an iOS AOT build), registration is skipped and
+    /// the default <c>[DllImport]</c> probing is relied upon instead.
     /// </remarks>
     internal static unsafe partial class AnydocNative
     {
         static AnydocNative()
         {
             RegisterResolver();
+        }
+
+        /// <summary>True when the running platform adopts runtimes/{rid}/native
+        /// libraries itself (iOS, iOS simulator, Mac Catalyst, Android).</summary>
+        internal static bool IsMobileRuntime()
+        {
+            string rid = GetRuntimeIdentifier();
+            return !string.IsNullOrEmpty(rid)
+                && (rid.StartsWith("ios", StringComparison.Ordinal)
+                    || rid.StartsWith("iossimulator", StringComparison.Ordinal)
+                    || rid.StartsWith("maccatalyst", StringComparison.Ordinal)
+                    || rid.StartsWith("android", StringComparison.Ordinal));
         }
 
         private static void RegisterResolver()
@@ -73,6 +100,13 @@ namespace AnyDocToMarkdown.Native
         {
             if (libraryName != __DllName)
             {
+                return IntPtr.Zero;
+            }
+
+            if (IsMobileRuntime())
+            {
+                // The iOS/Android/Catalyst runtimes already bundle the library from
+                // runtimes/{rid}/native and probe it by name; leave the loading to it.
                 return IntPtr.Zero;
             }
 
@@ -125,6 +159,21 @@ namespace AnyDocToMarkdown.Native
             catch
             {
                 return IntPtr.Zero;
+            }
+        }
+
+        // RuntimeInformation.RuntimeIdentifier (net5+) only exists at run time;
+        // netstandard2.0 cannot call it at compile time, so go through reflection.
+        private static string GetRuntimeIdentifier()
+        {
+            try
+            {
+                PropertyInfo property = typeof(RuntimeInformation).GetProperty("RuntimeIdentifier");
+                return property?.GetValue(null) as string ?? string.Empty;
+            }
+            catch
+            {
+                return string.Empty;
             }
         }
     }

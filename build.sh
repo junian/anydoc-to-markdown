@@ -19,16 +19,25 @@ set -eu
 cd "$(dirname "$0")"
 root=$(pwd)
 
-# RID -> rust target triple -> artifact filename
+# RID -> builder -> rust triple -> library artifact
 # (cargo names cdylibs lib<name>.dylib/.so and <name>.dll on their platforms)
 targets() {
-  echo osx-x64:x86_64-apple-darwin:libanydoc_dotnet.dylib
-  echo osx-arm64:aarch64-apple-darwin:libanydoc_dotnet.dylib
-  echo win-x86:i686-pc-windows-gnu:anydoc_dotnet.dll
-  echo win-x64:x86_64-pc-windows-gnu:anydoc_dotnet.dll
-  echo win-arm64:aarch64-pc-windows-gnullvm:anydoc_dotnet.dll
-  echo linux-x64:x86_64-unknown-linux-gnu:libanydoc_dotnet.so
-  echo linux-arm64:aarch64-unknown-linux-gnu:libanydoc_dotnet.so
+  echo osx-x64:cargo:x86_64-apple-darwin:libanydoc_dotnet.dylib
+  echo osx-arm64:cargo:aarch64-apple-darwin:libanydoc_dotnet.dylib
+  echo win-x86:zigbuild:i686-pc-windows-gnu:anydoc_dotnet.dll
+  echo win-x64:zigbuild:x86_64-pc-windows-gnu:anydoc_dotnet.dll
+  echo win-arm64:zigbuild:aarch64-pc-windows-gnullvm:anydoc_dotnet.dll
+  echo linux-x64:zigbuild:x86_64-unknown-linux-gnu:libanydoc_dotnet.so
+  echo linux-arm64:zigbuild:aarch64-unknown-linux-gnu:libanydoc_dotnet.so
+  echo ios-arm64:cargo:aarch64-apple-ios:libanydoc_dotnet.dylib
+  echo iossimulator-arm64:cargo:aarch64-apple-ios-sim:libanydoc_dotnet.dylib
+  echo iossimulator-x64:cargo:x86_64-apple-ios:libanydoc_dotnet.dylib
+  echo maccatalyst-arm64:cargo:aarch64-apple-ios-macabi:libanydoc_dotnet.dylib
+  echo maccatalyst-x64:cargo:x86_64-apple-ios-macabi:libanydoc_dotnet.dylib
+  echo android-arm64:ndk:aarch64-linux-android:libanydoc_dotnet.so
+  echo android-arm:ndk:armv7-linux-androideabi:libanydoc_dotnet.so
+  echo android-x64:ndk:x86_64-linux-android:libanydoc_dotnet.so
+  echo android-x86:ndk:i686-linux-android:libanydoc_dotnet.so
 }
 
 host_rid() {
@@ -42,7 +51,9 @@ host_rid() {
 }
 
 has_zigbuild() {
-  command -v cargo-zigbuild >/dev/null 2>&1
+  command -v cargo-zigbuild >/dev/null 2>&1 \
+    || [ -x "$HOME/.cargo/bin/cargo-zigbuild" ] \
+    || command -v zigbuild >/dev/null 2>&1
 }
 
 build_rid() {
@@ -50,19 +61,20 @@ build_rid() {
   line=$(targets | grep "^$rid:" || true)
   [ -n "$line" ] || { echo "unknown RID: $rid" >&2; exit 2; }
   rest=${line#*:}          # strip rid
+  builder=${rest%%:*}      # cargo / zigbuild / ndk
+  rest=${rest#*:}          # strip builder
   triple=${rest%%:*}       # rust target triple
   artifact=${rest#*:}      # cdylib filename
 
-  echo "-- building $rid ($triple)"
+  echo "-- building $rid ($builder, $triple)"
   if ! rustup target list --installed 2>/dev/null | grep -qx "$triple"; then
     echo "   target $triple not installed; skipping (add it with: rustup target add $triple)" >&2
     return 1
   fi
 
-  if has_zigbuild && [ "$triple" != "x86_64-apple-darwin" ] && [ "$triple" != "aarch64-apple-darwin" ]; then
-    cargo zigbuild --manifest-path "$root/native/Cargo.toml" --release --target "$triple" -p anydoc-dotnet
-  else
-    cargo build --manifest-path "$root/native/Cargo.toml" --release --target "$triple" -p anydoc-dotnet
+  if ! run_build "$root/native" "$builder" "$triple"; then
+    echo "   build failed for $triple" >&2
+    return 1
   fi
 
   out=$(find "$root/native/target/$triple/release" -type f -name "$artifact" 2>/dev/null | head -n 1)
@@ -70,6 +82,31 @@ build_rid() {
   mkdir -p "$root/src/AnyDocToMarkdown/runtimes/$rid/native"
   cp "$out" "$root/src/AnyDocToMarkdown/runtimes/$rid/native/$artifact"
   echo "   -> src/AnyDocToMarkdown/runtimes/$rid/native/$artifact"
+}
+
+# Run the relevant cargo build for a triple.
+#   cargo: the Apple triples, built with the Xcode SDK.
+#   zigbuild: Linux/Windows via cargo-zigbuild (zig) when available.
+#   ndk: Android via cargo-ndk (requires the NDK, e.g. ANDROID_NDK_HOME).
+run_build() {
+  native_dir=$1; builder=$2; triple=$3
+  case "$builder" in
+    ndk)
+      [ -d "${ANDROID_NDK_HOME:-}" ] || { echo "   ANDROID_NDK_HOME is not set" >&2; return 1; }
+      (cd "$native_dir" && cargo ndk -t "$triple" build --release)
+      ;;
+    zigbuild)
+      if has_zigbuild; then
+        cargo zigbuild --manifest-path "$native_dir/Cargo.toml" --release --target "$triple" -p anydoc-dotnet
+      else
+        echo "   cargo-zigbuild not installed; falling back to plain cargo" >&2
+        cargo build --manifest-path "$native_dir/Cargo.toml" --release --target "$triple" -p anydoc-dotnet
+      fi
+      ;;
+    *)
+      cargo build --manifest-path "$native_dir/Cargo.toml" --release --target "$triple" -p anydoc-dotnet
+      ;;
+  esac
 }
 
 if [ "$#" -eq 0 ]; then

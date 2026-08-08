@@ -29,15 +29,16 @@
   -->
 
   <!--
-    Native binaries laid out per NuGet's runtimes/{rid}/native convention. Packed
-    into the package and copied into the build output so a project reference (or
-    a referenced consumer) resolves them at run time too.
+    Native binaries laid out per NuGet's runtimes/{rid}/native convention and
+    packed for every RID; when the package is consumed, the SDK copies only the
+    assets matching the target's RuntimeIdentifier (iOS/Android/desktop
+    resolvers bundle exactly their architecture). Nothing is copied on a plain
+    project reference; host tests copy the osx-arm64 library explicitly.
   -->
   <ItemGroup>
     <None Include="runtimes/**/*"
           Pack="true"
-          PackagePath="runtimes/"
-          CopyToOutputDirectory="PreserveNewest" />
+          PackagePath="runtimes/" />
   </ItemGroup>
 
   <!-- Shared types used by both the native and WebAssembly bindings live in

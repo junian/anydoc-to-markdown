@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiDemo.MainPage"
+             Title="AnyDoc → Markdown">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto"
+          Padding="20"
+          RowSpacing="12">
+
+        <Label Text="Select a document and it is converted to Markdown automatically."
+               Style="{StaticResource Headline}"
+               SemanticProperties.HeadingLevel="Level2" />
+
+        <Button x:Name="PickButton"
+                Grid.Row="1"
+                Text="Select document…"
+                Clicked="OnPickDocumentClicked"
+                SemanticProperties.Hint="Opens a file picker to choose a document to convert" />
+
+        <Label x:Name="StatusLabel"
+               Grid.Row="2"
+               Style="{StaticResource SubHeadline}"
+               Text="No document selected"
+               LineBreakMode="WordWrap" />
+
+        <Label Grid.Row="3"
+               Text="Markdown output:"
+               Style="{StaticResource SubHeadline}" />
+
+        <Editor x:Name="MarkdownEditor"
+                Grid.Row="4"
+                IsReadOnly="true"
+                AutoSize="TextChanges"
+                Placeholder="The converted Markdown appears here…"
+                FontFamily="Monospace" />
+
+        <Grid Grid.Row="5"
+              ColumnDefinitions="*,*"
+              ColumnSpacing="12">
+            <Button x:Name="CopyButton"
+                    Text="Copy Markdown"
+                    Clicked="OnCopyClicked"
+                    IsEnabled="false" />
+            <Button x:Name="SaveButton"
+                    Grid.Column="1"
+                    Text="Save Markdown"
+                    Clicked="OnSaveClicked"
+                    IsEnabled="false" />
+        </Grid>
+    </Grid>
+
+</ContentPage>
