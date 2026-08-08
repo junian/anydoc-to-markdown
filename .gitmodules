@@ -1,0 +1,3 @@
+[submodule "libs/anydoc"]
+	path = libs/anydoc
+	url = https://github.com/junian/anydoc.git
