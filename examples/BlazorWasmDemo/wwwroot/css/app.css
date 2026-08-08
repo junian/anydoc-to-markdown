@@ -56,6 +56,37 @@ footer {
     padding: 5px;
 }
 
+.page-stack {
+    width: 100%;
+}
+
+.hero-card,
+.control-card {
+    width: 100%;
+}
+
+.result-card {
+    width: 100%;
+}
+
+.result-card .md-output {
+    width: 100%;
+    display: block;
+}
+
+.result-card fluent-text-area.md-output::part(control) {
+    width: 100%;
+    max-width: none;
+}
+
+.md-output::part(textarea) {
+    font-family: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre;
+    min-width: 100%;
+}
+
 
 #blazor-error-ui {
     background: lightyellow;

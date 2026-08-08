@@ -3,11 +3,12 @@
         xmlns:vm="using:AvaloniaUIDemo.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="AvaloniaUIDemo.Views.MainWindow"
         x:DataType="vm:MainViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="AvaloniaUIDemo">
+        Title="AnyDoc → Markdown"
+        Opened="OnWindowOpened">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -15,8 +16,51 @@
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <TextBox Text="{Binding Greeting}"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center" />
+    <DockPanel Margin="20">
+        <!-- Title + status at the top -->
+        <StackPanel DockPanel.Dock="Top" Spacing="12">
+            <TextBlock
+                Text="Select a document and it is converted to Markdown automatically."
+                FontSize="16"
+                FontWeight="Bold" />
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button
+                    Content="Select document…"
+                    Command="{Binding PickDocumentCommand}"
+                    VerticalAlignment="Center" />
+                <TextBlock
+                    Text="{Binding Status}"
+                    VerticalAlignment="Center"
+                    TextWrapping="Wrap" />
+            </StackPanel>
+
+            <TextBlock Text="Markdown output:" FontWeight="SemiBold" />
+        </StackPanel>
+
+        <!-- Result actions at the bottom -->
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="12" Margin="0,12,0,0">
+            <Button
+                Content="Copy Markdown"
+                Command="{Binding CopyMarkdownCommand}"
+                IsEnabled="{Binding HasCopyableMarkdown}" />
+            <Button
+                Content="Save Markdown…"
+                Command="{Binding SaveMarkdownCommand}"
+                IsEnabled="{Binding HasCopyableMarkdown}" />
+        </StackPanel>
+
+        <!-- The converted Markdown -->
+        <TextBox
+            Text="{Binding Markdown, Mode=TwoWay}"
+            AcceptsReturn="True"
+            AcceptsTab="True"
+            FontFamily="Monospace"
+            IsReadOnly="True"
+            PlaceholderText="The converted Markdown appears here…"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+
+    </DockPanel>
 
 </Window>

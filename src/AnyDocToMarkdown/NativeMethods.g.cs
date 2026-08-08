@@ -12,7 +12,7 @@ namespace AnyDocToMarkdown.Native
 {
     internal static unsafe partial class AnydocNative
     {
-        const string __DllName = "anydoc_dotnet";
+        const string __DllName = "anydoc";
 
 
 

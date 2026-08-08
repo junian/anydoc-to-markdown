@@ -22,22 +22,22 @@ root=$(pwd)
 # RID -> builder -> rust triple -> library artifact
 # (cargo names cdylibs lib<name>.dylib/.so and <name>.dll on their platforms)
 targets() {
-  echo osx-x64:cargo:x86_64-apple-darwin:libanydoc_dotnet.dylib
-  echo osx-arm64:cargo:aarch64-apple-darwin:libanydoc_dotnet.dylib
-  echo win-x86:zigbuild:i686-pc-windows-gnu:anydoc_dotnet.dll
-  echo win-x64:zigbuild:x86_64-pc-windows-gnu:anydoc_dotnet.dll
-  echo win-arm64:zigbuild:aarch64-pc-windows-gnullvm:anydoc_dotnet.dll
-  echo linux-x64:zigbuild:x86_64-unknown-linux-gnu:libanydoc_dotnet.so
-  echo linux-arm64:zigbuild:aarch64-unknown-linux-gnu:libanydoc_dotnet.so
-  echo ios-arm64:cargo:aarch64-apple-ios:libanydoc_dotnet.dylib
-  echo iossimulator-arm64:cargo:aarch64-apple-ios-sim:libanydoc_dotnet.dylib
-  echo iossimulator-x64:cargo:x86_64-apple-ios:libanydoc_dotnet.dylib
-  echo maccatalyst-arm64:cargo:aarch64-apple-ios-macabi:libanydoc_dotnet.dylib
-  echo maccatalyst-x64:cargo:x86_64-apple-ios-macabi:libanydoc_dotnet.dylib
-  echo android-arm64:ndk:aarch64-linux-android:libanydoc_dotnet.so
-  echo android-arm:ndk:armv7-linux-androideabi:libanydoc_dotnet.so
-  echo android-x64:ndk:x86_64-linux-android:libanydoc_dotnet.so
-  echo android-x86:ndk:i686-linux-android:libanydoc_dotnet.so
+  echo osx-x64:cargo:x86_64-apple-darwin:libanydoc.dylib
+  echo osx-arm64:cargo:aarch64-apple-darwin:libanydoc.dylib
+  echo win-x86:zigbuild:i686-pc-windows-gnu:anydoc.dll
+  echo win-x64:zigbuild:x86_64-pc-windows-gnu:anydoc.dll
+  echo win-arm64:zigbuild:aarch64-pc-windows-gnullvm:anydoc.dll
+  echo linux-x64:zigbuild:x86_64-unknown-linux-gnu:libanydoc.so
+  echo linux-arm64:zigbuild:aarch64-unknown-linux-gnu:libanydoc.so
+  echo ios-arm64:cargo:aarch64-apple-ios:libanydoc.dylib
+  echo iossimulator-arm64:cargo:aarch64-apple-ios-sim:libanydoc.dylib
+  echo iossimulator-x64:cargo:x86_64-apple-ios:libanydoc.dylib
+  echo maccatalyst-arm64:cargo:aarch64-apple-ios-macabi:libanydoc.dylib
+  echo maccatalyst-x64:cargo:x86_64-apple-ios-macabi:libanydoc.dylib
+  echo android-arm64:ndk:aarch64-linux-android:libanydoc.so
+  echo android-arm:ndk:armv7-linux-androideabi:libanydoc.so
+  echo android-x64:ndk:x86_64-linux-android:libanydoc.so
+  echo android-x86:ndk:i686-linux-android:libanydoc.so
 }
 
 host_rid() {

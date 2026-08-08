@@ -11,7 +11,7 @@ repository = "https://github.com/junian/anydoc"
 publish = false
 
 [lib]
-name = "anydoc_dotnet"
+name = "anydoc"
 crate-type = ["cdylib"]
 
 [dependencies]

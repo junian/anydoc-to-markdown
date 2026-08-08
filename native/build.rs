@@ -6,7 +6,7 @@ fn main() {
     let out = Path::new(env!("CARGO_MANIFEST_DIR")).join("../src/AnyDocToMarkdown/NativeMethods.g.cs");
     csbindgen::Builder::default()
         .input_extern_file("src/lib.rs")
-        .csharp_dll_name("anydoc_dotnet")
+        .csharp_dll_name("anydoc")
         .csharp_namespace("AnyDocToMarkdown.Native")
         .csharp_class_name("AnydocNative")
         .csharp_class_accessibility("internal")
